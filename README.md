@@ -51,12 +51,14 @@ Aplikasi ini menggunakan arsitektur berikut untuk *production*:
    - `DIRECT_URL`: Isi dengan *Direct Connection* dari Neon.
    - `JWT_SECRET`: Buat string acak (misalnya bisa *generate* lewat password manager).
    - `NODE_ENV`: `production`
+   - `DISABLE_REGISTER`: `true` (Ini sangat penting agar tidak ada orang luar yang bisa mendaftar ke aplikasi Anda).
    - `CLIENT_URL`: *(Biarkan kosong atau isi sementara dengan `https://localhost` karena kita belum mendeploy Vercel. Anda akan meng-update ini nanti!)*
 6. Klik **Create Web Service**. Tunggu sampai deploy selesai.
-7. **Jalankan Migrasi Database**:
+7. **Jalankan Migrasi Database & Seeding User**:
    - Setelah *deploy* sukses, pergi ke tab **Shell** di dashboard Render Anda.
-   - Ketikkan: `npm run migrate:deploy`
-   - Ini akan membuat semua tabel di dalam database Neon Anda.
+   - Ketikkan: `npm run migrate:deploy` (Ini akan membuat semua tabel di dalam database Neon Anda).
+   - Setelah selesai, ketikkan: `npm run seed`
+   - Terminal Render akan menampilkan **Temporary Password** untuk kedua akun Anda. Salin/catat *password* tersebut untuk login pertama kali, lalu segera ganti *password* Anda di menu **Settings**.
 
 > [!NOTE]
 > Pada versi gratis (Free Tier) Render, *server backend* akan masuk ke mode "tidur" (Sleep) setelah 15 menit tidak ada *request*. Karena itu, *request* pertama setelah aplikasi lama ditinggalkan bisa memakan waktu hingga 1 menit untuk *"spin-up"* (membangunkan) server kembali. 
