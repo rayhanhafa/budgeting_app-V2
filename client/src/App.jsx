@@ -9,6 +9,7 @@ import Budgets from './pages/Budgets';
 import Savings from './pages/Savings';
 import Categories from './pages/Categories';
 import Subscriptions from './pages/Subscriptions';
+import PwaBadge from './components/PwaBadge';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -40,6 +41,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <PwaBadge />
         <Routes>
           <Route 
             path="/login" 

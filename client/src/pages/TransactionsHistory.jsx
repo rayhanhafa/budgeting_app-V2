@@ -69,12 +69,21 @@ const TransactionsHistory = () => {
         </div>
         
         <button 
-          onClick={() => {
-            const token = localStorage.getItem('token');
-            if (token) {
-              window.open(`http://localhost:5000/api/export?token=${token}`, '_blank');
-              // Alternatively, trigger a fetch and blob download for better auth header handling,
-              // but since we want to be simple, we can fetch and download blob.
+          onClick={async () => {
+            try {
+              const response = await api.get('/export', { responseType: 'blob' });
+              const blob = new Blob([response.data], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              window.URL.revokeObjectURL(url);
+            } catch (error) {
+              console.error('Failed to export transactions:', error);
+              alert('Gagal mengekspor data.');
             }
           }}
           className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
