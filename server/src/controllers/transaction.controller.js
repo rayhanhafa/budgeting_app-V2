@@ -75,8 +75,8 @@ export const createTransaction = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    if (Number(amount) <= 0) {
-      return res.status(400).json({ message: 'Amount must be strictly positive' });
+    if (isNaN(Number(amount)) || Number(amount) <= 0) {
+      return res.status(400).json({ message: 'Amount must be a strictly positive number' });
     }
 
     if (type === 'TRANSFER' && !toAccountId) {
@@ -137,8 +137,8 @@ export const updateTransaction = async (req, res) => {
     const { id } = req.params;
     const { accountId, categoryId, type, amount, note, date, toAccountId } = req.body;
 
-    if (amount !== undefined && Number(amount) <= 0) {
-      return res.status(400).json({ message: 'Amount must be strictly positive' });
+    if (amount !== undefined && (isNaN(Number(amount)) || Number(amount) <= 0)) {
+      return res.status(400).json({ message: 'Amount must be a strictly positive number' });
     }
 
     const oldTx = await prisma.transaction.findFirst({
