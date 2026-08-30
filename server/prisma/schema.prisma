@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  accounts     Account[]
+  categories            Category[]
+  transactions          Transaction[]
+  budgets               Budget[]
+  savingsGoals          SavingsGoal[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([email])
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      AccountType
+  balance   Decimal     @db.Decimal(19, 4)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactionsFrom Transaction[] @relation("AccountTransactions")
+  transactionsTo   Transaction[] @relation("ToAccountTransactions")
+  recurringFrom    RecurringTransaction[] @relation("AccountRecurring")
+  recurringTo      RecurringTransaction[] @relation("ToAccountRecurring")
+
+  @@index([userId])
+}
+
+enum AccountType {
+  BANK
+  CASH
+  EWALLET
+}
+
+model Category {
+  id        String       @id @default(uuid())
+  userId    String?      // nullable: null = sistem/default kategori
+  user      User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      CategoryType
+  icon      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId])
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account         @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Restrict)
+  categoryId  String?         
+  category    Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type        TransactionType
+  amount      Decimal         @db.Decimal(19, 4)
+  note        String?
+  date        DateTime        @db.Date
+  toAccountId String?         
+  toAccount   Account?        @relation("ToAccountTransactions", fields: [toAccountId], references: [id], onDelete: Restrict)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId, date])
+  @@index([accountId])
+  @@index([categoryId])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+model Budget {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  amount     Decimal      @db.Decimal(19, 4)
+  period     BudgetPeriod
+  month      Int
+  year       Int
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([userId, categoryId, month, year])
+  @@index([userId, month, year])
+}
+
+enum BudgetPeriod {
+  MONTHLY
+  WEEKLY
+}
+
+model SavingsGoal {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  targetAmount  Decimal   @db.Decimal(19, 4)
+  currentAmount Decimal   @db.Decimal(19, 4) @default(0)
+  targetDate    DateTime? @db.Date
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model RecurringTransaction {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account         @relation("AccountRecurring", fields: [accountId], references: [id], onDelete: Restrict)
+  categoryId  String?         
+  category    Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type        TransactionType
+  amount      Decimal         @db.Decimal(19, 4)
+  note        String?
+  toAccountId String?         
+  toAccount   Account?        @relation("ToAccountRecurring", fields: [toAccountId], references: [id], onDelete: Restrict)
+  
+  frequency   Frequency
+  nextDate    DateTime        @db.Date
+  isActive    Boolean         @default(true)
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([nextDate])
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}

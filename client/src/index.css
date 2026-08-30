@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-income: #22c55e;
+  --color-expense: #ef4444;
+  --color-warning: #f59e0b;
+  --color-bg: #f8fafc;
+  --color-text-main: #1e293b;
+  --color-text-muted: #64748b;
+  --color-card: #ffffff;
+  --color-border: #e2e8f0;
+}
+
+@layer base {
+  :root {
+    --bg-color: var(--color-bg);
+    --text-color: var(--color-text-main);
+    --card-bg: var(--color-card);
+    --border-color: var(--color-border);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #f1f5f9;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+    }
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem; /* ~12px */
+  }
+}
