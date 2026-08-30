@@ -1,38 +1,46 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
+const generatePassword = (length = 12) => {
+  return crypto.randomBytes(length).toString('base64').slice(0, length);
+};
+
 async function main() {
-  const defaultCategories = [
-    { name: 'Makan', type: 'EXPENSE', icon: 'utensils' },
-    { name: 'Transport', type: 'EXPENSE', icon: 'car' },
-    { name: 'Hiburan', type: 'EXPENSE', icon: 'film' },
-    { name: 'Tagihan', type: 'EXPENSE', icon: 'file-text' },
-    { name: 'Lainnya', type: 'EXPENSE', icon: 'box' },
-    { name: 'Gaji', type: 'INCOME', icon: 'dollar-sign' },
-    { name: 'Lainnya', type: 'INCOME', icon: 'box' },
+  const usersToCreate = [
+    { name: 'Rayhan', email: 'rayhanhafa@gmail.com' },
+    { name: 'KucingTidur', email: 'kkucingtidurr00@gmail.com' }
   ];
 
-  console.log('Start seeding default categories...');
-  
-  for (const cat of defaultCategories) {
-    const exists = await prisma.category.findFirst({
-      where: { name: cat.name, type: cat.type, userId: null }
+  console.log('Seeding users...');
+  console.log('-------------------------------------------');
+
+  for (const u of usersToCreate) {
+    const existingUser = await prisma.user.findUnique({ where: { email: u.email } });
+    
+    if (existingUser) {
+      console.log(`User ${u.email} already exists. Skipping.`);
+      continue;
+    }
+
+    const rawPassword = generatePassword(12);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(rawPassword, salt);
+
+    await prisma.user.create({
+      data: {
+        name: u.name,
+        email: u.email,
+        passwordHash: hashedPassword,
+      }
     });
 
-    if (!exists) {
-      await prisma.category.create({
-        data: {
-          name: cat.name,
-          type: cat.type,
-          icon: cat.icon,
-          userId: null, // null userId means default category
-        }
-      });
-      console.log(`Created default category: ${cat.name} (${cat.type})`);
-    } else {
-      console.log(`Default category already exists: ${cat.name} (${cat.type})`);
-    }
+    console.log(`Created user: ${u.email}`);
+    console.log(`Temporary Password: ${rawPassword}`);
+    console.log(`(Please login and change this password immediately in Settings)`);
+    console.log('-------------------------------------------');
   }
 
   console.log('Seeding finished.');

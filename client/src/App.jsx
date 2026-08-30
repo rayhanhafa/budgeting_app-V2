@@ -9,6 +9,7 @@ import Budgets from './pages/Budgets';
 import Savings from './pages/Savings';
 import Categories from './pages/Categories';
 import Subscriptions from './pages/Subscriptions';
+import Settings from './pages/Settings';
 import PwaBadge from './components/PwaBadge';
 
 const ProtectedRoute = ({ children }) => {
@@ -96,6 +97,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Subscriptions />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } 
           />
