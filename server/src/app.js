@@ -31,8 +31,23 @@ app.use('/api/savings', savingsRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/recurring', recurringRoutes);
 
+import { processRecurringTransactions } from './cron/recurring.js';
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
 
+app.get('/api/cron/trigger', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  await processRecurringTransactions();
+  res.status(200).json({ message: 'Recurring transactions processed successfully' });
+});
+
 export default app;
+
+// touch
+// touch
