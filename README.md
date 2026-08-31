@@ -1,83 +1,143 @@
-# Budgeting App
+<div align="center">
+  <h1>💰 Personal Budgeting App</h1>
+  <p>A full-stack, secure, and automated personal finance manager built with React, Node.js, and PostgreSQL.</p>
+  
+  [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+  [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+  [![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)](https://www.prisma.io/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+  [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+</div>
 
-A full-stack personal finance application built with React, Vite, Express, and PostgreSQL.
+<br />
 
-## Project Structure
-- `/client` - Frontend React application (Vite, TailwindCSS)
-- `/server` - Backend Express application (Prisma, PostgreSQL)
+## 📖 About The Project
 
-## PWA & Service Worker
-Aplikasi ini sudah diatur sebagai **Progressive Web App (PWA)**, yang berarti dapat di-"Add to Home Screen" dan memiliki fitur *caching* *offline* dasar.
+This is a comprehensive, production-ready personal finance application designed to help users track their income, expenses, and savings goals across multiple accounts. The application features a robust backend architecture deployed via Serverless functions and a responsive, modern frontend UI.
 
-### Cara Menjalankan Mode PWA
-Mode PWA (dan *Service Worker*) biasanya tidak aktif saat menjalankan server pengembangan biasa (`npm run dev`). Untuk menguji PWA:
-1. Jalankan *build* production: `npm run build` di dalam folder `client`.
-2. Jalankan *preview* server: `npm run preview`.
-3. Buka URL yang diberikan di Chrome, lalu cek *Chrome DevTools* > *Application* > *Manifest* & *Service Workers* untuk melihat status instalasi.
-4. Atau, akses lewat HP (Android/iOS) ke alamat IP lokal komputer Anda dan uji coba menekan "Add to Home Screen" atau menggunakan *prompt* instalasi bawaan.
+It was built with a strong emphasis on **Security** (JWT, Rate Limiting, CORS, private registration), **Automation** (Serverless Cron Jobs for recurring transactions), and **Data Integrity** (Prisma ORM with strict relational constraints).
 
-### Limitasi Saat Ini
-1. **Push Notifications**: Belum diimplementasikan. Push notification untuk web apps, terutama di iOS (membutuhkan versi iOS 16.4+ dan aplikasi harus sudah terinstal ke *Home Screen*), cukup kompleks dan akan ditambahkan di fase masa depan.
-2. **Offline Data Mode**: Aplikasi ini secara *offline* akan menampilkan UI (HTML/CSS/JS) karena sudah di-cache oleh *Service Worker*. Namun, fitur-fitur transaksi finansial yang mengambil data dari database atau merubah data akan gagal secara *offline* karena strategi untuk *path* `/api/*` diatur ke *Network Only* demi mencegah *user* melihat saldo yang belum tersinkron.
+## ✨ Key Features
 
-## Deployment Guide
+- **Multi-Account Management:** Track balances across Bank, Cash, and E-Wallet accounts.
+- **Automated Recurring Transactions:** Set up daily, weekly, or monthly recurring bills. A Serverless Cron Job automatically processes them with a precise "catch-up" logic to prevent missed transactions.
+- **Budgeting & Savings Goals:** Allocate monthly/weekly budgets per category and monitor real-time savings progression.
+- **Advanced Transaction Handling:** Supports Income, Expense, and internal Transfers between accounts.
+- **Enterprise-grade Security:** 
+  - JWT-based authentication with secure HTTP headers.
+  - Express Rate Limiting to prevent brute-force login attacks.
+  - Hidden registration (`DISABLE_REGISTER` flag) for private/invite-only usage.
+- **CSV Export:** Download all financial reports seamlessly.
 
-Aplikasi ini menggunakan arsitektur berikut untuk *production*:
-- **Frontend**: Vercel (React + Vite)
-- **Backend**: Vercel (Node.js Serverless)
-- **Database**: Neon (PostgreSQL Serverless)
+---
 
-> [!WARNING]
-> Urutan deployment: **Neon -> Seeding -> Backend (Vercel) -> Frontend (Vercel)**.
+## 🛠 Tech Stack & Architecture
 
-### 1. Setup Database (Neon)
-1. Buat akun dan *project* baru di [Neon.tech](https://neon.tech).
-2. Setelah database dibuat, pergi ke *dashboard* utama *project* Anda.
-3. Anda akan melihat bagian **Connection Details**.
-4. Ambil 2 jenis *connection string*:
-   - **Pooled**: Aktifkan opsi "Pooled connection" jika ada (`DATABASE_URL`).
-   - **Direct**: Nonaktifkan "Pooled connection" untuk mendapatkan ini (`DIRECT_URL`).
+### Frontend (Client)
+- **Framework:** React.js + Vite for blazing-fast builds.
+- **Styling:** Modern, responsive custom CSS architecture.
+- **State Management:** React Context API for Global Auth state.
+- **HTTP Client:** Axios with dynamic interceptors for token handling.
 
-### 2. Seeding Database (Lokal)
-Karena Vercel tidak memiliki terminal untuk menjalankan skrip manual, kita harus melakukan *seeding* akun dari komputer Anda, diarahkan langsung ke Neon:
-1. Buka file `.env` di folder `server/`.
-2. Ubah `DATABASE_URL` sementara menjadi link **Pooled Connection** Neon Anda.
-3. Buka terminal di folder `server/`, lalu jalankan:
-   ```bash
-   npx prisma db push
-   npm run seed
-   ```
-4. Terminal akan menampilkan **Temporary Password** untuk kedua akun. Catat password ini.
-5. (Opsional) Kembalikan isi file `.env` Anda ke database lokal jika masih ingin *development*.
+### Backend (Server)
+- **Runtime:** Node.js + Express.js.
+- **Database:** PostgreSQL (Hosted on Neon.tech).
+- **ORM:** Prisma (Configured with global singleton pattern for serverless cold-starts).
+- **Security:** `bcryptjs` for password hashing, `jsonwebtoken`, `cors`, `express-rate-limit`.
 
-### 3. Setup Backend (Vercel)
-1. Buat akun di [Vercel.com](https://vercel.com) dan klik **Add New > Project**.
-2. Hubungkan *repository* GitHub Anda.
-3. **PENTING**: Di bagian **Root Directory**, pilih folder `server`.
-4. Di bagian **Framework Preset**, pilih **Other**.
-5. Buka bagian **Environment Variables** dan tambahkan:
-   - `DATABASE_URL`: Isi dengan *Pooled Connection* dari Neon.
-   - `DIRECT_URL`: Isi dengan *Direct Connection* dari Neon.
-   - `JWT_SECRET`: Buat string acak (misalnya bisa *generate* lewat password manager).
-   - `CRON_SECRET`: Buat string acak untuk mengamankan *cron job* Vercel.
-   - `NODE_ENV`: `production`
-   - `DISABLE_REGISTER`: `true`
-   - `CLIENT_URL`: *(Biarkan kosong atau isi dengan `https://localhost` sementara)*
-6. Klik **Deploy**. Tunggu sampai deploy selesai. Migrasi database (`prisma migrate deploy`) akan otomatis berjalan saat proses _build_.
+### Infrastructure & Deployment
+- **Frontend Hosting:** Vercel
+- **Backend API:** Vercel Serverless Functions (`api/index.js` approach).
+- **Automation:** Vercel Cron Jobs securely triggered via `CRON_SECRET` Bearer tokens.
 
-### 4. Setup Frontend (Vercel)
-1. Kembali ke *dashboard* Vercel, klik **Add New > Project**.
-2. Pilih *repository* GitHub yang sama.
-3. **PENTING**: Di bagian **Framework Preset**, pastikan terdeteksi sebagai "Vite". Di bagian **Root Directory**, pilih folder `client`.
-4. Buka bagian **Environment Variables** dan tambahkan:
-   - `VITE_API_URL`: Isi dengan URL domain Vercel backend Anda (contoh: `https://budgeting-backend.vercel.app/api`). **Jangan lupa tambahkan `/api` di ujungnya.**
-5. Klik **Deploy**.
+---
 
-### 5. Langkah Terakhir (Konfigurasi CORS)
-Setelah Frontend selesai di-deploy:
-1. *Copy* domain Frontend Anda (contoh: `https://budgeting-frontend.vercel.app`).
-2. Kembali ke *Project* **Backend** di Vercel > menu **Settings** > **Environment Variables**.
-3. Perbarui variabel `CLIENT_URL` dengan domain Frontend tersebut (tanpa garis miring di belakang).
-4. Vercel akan otomatis me-*redeploy* atau cukup klik **Redeploy** pada deployment terbaru agar CORS diperbarui.
+## 🚀 Local Development Setup
 
-**Selesai!** Aplikasi Anda kini *live* dan 100% gratis di *production*.
+To run this project locally, you need Node.js (v18+) and PostgreSQL installed on your machine.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/rayhanhafa/budgeting_app-V2.git
+cd budgeting_app-V2
+```
+
+### 2. Setup Database & Backend
+```bash
+cd server
+npm install
+```
+Create a `.env` file in the `server` directory:
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/budgeting_app"
+JWT_SECRET="your_super_secret_key"
+PORT=5000
+DISABLE_REGISTER="false"
+CRON_SECRET="local_test_secret"
+```
+Run migrations and seed the database:
+```bash
+npx prisma db push
+npm run seed
+npm run dev
+```
+
+### 3. Setup Frontend
+Open a new terminal and navigate to the client folder:
+```bash
+cd client
+npm install
+```
+Create a `.env` file in the `client` directory:
+```env
+VITE_API_URL="http://localhost:5000/api"
+```
+Start the frontend server:
+```bash
+npm run dev
+```
+Visit `http://localhost:5173` in your browser.
+
+---
+
+## ☁️ Production Deployment Guide
+
+This app is optimized for a 100% free serverless architecture using **Vercel** and **Neon**.
+
+### 1. Database Setup (Neon.tech)
+1. Create a PostgreSQL project on [Neon.tech](https://neon.tech).
+2. Copy the **Pooled Connection String** (`DATABASE_URL`) and the **Direct Connection String** (`DIRECT_URL`).
+
+### 2. Seeding the Database
+Before deploying, populate your production database from your local machine:
+1. Temporarily replace your local `server/.env` `DATABASE_URL` with the Neon Pooled string.
+2. Run `npx prisma db push` and `npm run seed`.
+3. Save the generated temporary passwords for your accounts.
+
+### 3. Backend Deployment (Vercel)
+1. Import the project into Vercel.
+2. Set the **Root Directory** to `server`.
+3. Add the following Environment Variables:
+   - `DATABASE_URL` (Neon Pooler)
+   - `DIRECT_URL` (Neon Direct)
+   - `JWT_SECRET` (Random secure string)
+   - `CRON_SECRET` (Random secure string for cron auth)
+   - `NODE_ENV` = `production`
+   - `DISABLE_REGISTER` = `true`
+4. Deploy! Vercel will automatically run `prisma generate && prisma migrate deploy` via the `postinstall` script.
+
+### 4. Frontend Deployment (Vercel)
+1. Import the project into Vercel again, but set the **Root Directory** to `client`.
+2. Add the Environment Variable:
+   - `VITE_API_URL` = `https://<your-backend-vercel-url>.vercel.app/api`
+3. Deploy!
+
+### 5. Finalize CORS
+Return to your Backend Project on Vercel, add/update the `CLIENT_URL` environment variable to match your new Frontend Vercel URL (e.g., `https://<your-frontend>.vercel.app`), and hit **Redeploy**.
+
+---
+
+<div align="center">
+  <i>Developed with ❤️ by <a href="https://github.com/rayhanhafa">Rayhan Hafa</a></i>
+</div>
