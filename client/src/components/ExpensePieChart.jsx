@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
+import { PrivacyContext } from '../context/PrivacyContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 // A fixed set of aesthetically pleasing colors for consistent category mapping
@@ -24,12 +25,13 @@ const stringToColorIndex = (str) => {
 };
 
 const CustomTooltip = ({ active, payload }) => {
+  const { formatCurrency } = useContext(PrivacyContext);
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
-        <p className="font-semibold text-slate-800 dark:text-slate-200">{data.name}</p>
-        <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+      <div className="bg-slate-900/90 text-white p-3 rounded-lg shadow-xl border border-slate-700/50">
+        <p className="font-semibold text-sm mb-1">{data.name}</p>
+        <p className="text-sm font-medium text-slate-300">
           Rp {data.value.toLocaleString('id-ID')}
         </p>
       </div>

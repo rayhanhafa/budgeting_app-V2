@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
+import { PrivacyContext } from '../context/PrivacyContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const CustomTooltip = ({ active, payload, label }) => {
+  const { formatCurrency } = useContext(PrivacyContext);
+
   if (active && payload && payload.length) {
     return (
       <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">

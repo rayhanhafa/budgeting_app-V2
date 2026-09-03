@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { PrivacyContext } from '../context/PrivacyContext';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../components/ConfirmModal';
@@ -9,6 +10,7 @@ const Subscriptions = () => {
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const { formatCurrency } = useContext(PrivacyContext);
 
   const fetchSubscriptions = async () => {
     try {

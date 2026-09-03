@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { PrivacyContext } from '../context/PrivacyContext';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../components/ConfirmModal';
@@ -13,6 +14,7 @@ const Savings = () => {
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const { formatCurrency } = useContext(PrivacyContext);
 
   // Form states
   const [formData, setFormData] = useState({ name: '', targetAmount: '', targetDate: '' });
@@ -122,7 +124,7 @@ const Savings = () => {
                 </div>
                 
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="font-medium text-blue-600 dark:text-blue-400">Rp {current.toLocaleString('id-ID')}</span>
                     <span className="text-slate-500">Rp {target.toLocaleString('id-ID')}</span>
                   </div>

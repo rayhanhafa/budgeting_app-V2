@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { PrivacyContext } from '../context/PrivacyContext';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import CurrencyInput from '../components/CurrencyInput';
@@ -11,6 +12,7 @@ const Budgets = () => {
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
+  const { formatCurrency } = useContext(PrivacyContext);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,13 +126,10 @@ const Budgets = () => {
             return (
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-xs text-slate-500">Total Spent</p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Rp {totalSpent.toLocaleString('id-ID')}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-500">Total Limit</p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Rp {totalBudget.toLocaleString('id-ID')}</p>
+                  <div className="flex justify-between items-end mt-4">
+                    <p className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(totalSpent)}</p>
+                    <p className="text-sm font-medium text-slate-500">of</p>
+                    <p className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(totalBudget)}</p>
                   </div>
                 </div>
                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-1 overflow-hidden">

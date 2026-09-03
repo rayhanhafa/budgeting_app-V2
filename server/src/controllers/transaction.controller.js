@@ -29,7 +29,7 @@ const applyTransactionToBalance = async (prismaTx, transaction, reverse = false)
 
 export const getTransactions = async (req, res) => {
   try {
-    const { month, year, category_id, account_id } = req.query;
+    const { month, year, category_id, account_id, startDate, endDate } = req.query;
 
     let whereClause = { userId: req.user.id };
 
@@ -41,12 +41,21 @@ export const getTransactions = async (req, res) => {
       ];
     }
 
-    if (month && year) {
-      const startDate = new Date(year, month - 1, 1);
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    if (startDate && endDate) {
       whereClause.date = {
-        gte: startDate,
-        lte: endDate,
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    } else if (startDate) {
+      whereClause.date = { gte: new Date(startDate) };
+    } else if (endDate) {
+      whereClause.date = { lte: new Date(endDate) };
+    } else if (month && year) {
+      const startOfMonth = new Date(year, month - 1, 1);
+      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+      whereClause.date = {
+        gte: startOfMonth,
+        lte: endOfMonth,
       };
     }
 

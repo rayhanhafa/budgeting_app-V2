@@ -38,86 +38,90 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+import { PrivacyProvider } from './context/PrivacyContext';
+
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <PwaBadge />
-        <Routes>
-          <Route 
-            path="/login" 
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } 
-          />
-          <Route 
-            path="/register" 
-            element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } 
-          />
-          <Route 
-            path="/transactions" 
-            element={
-              <ProtectedRoute>
-                <TransactionsHistory />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/budgets" 
-            element={
-              <ProtectedRoute>
-                <Budgets />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/savings" 
-            element={
-              <ProtectedRoute>
-                <Savings />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/categories" 
-            element={
-              <ProtectedRoute>
-                <Categories />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/subscriptions" 
-            element={
-              <ProtectedRoute>
-                <Subscriptions />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </BrowserRouter>
+      <PrivacyProvider>
+        <BrowserRouter>
+          <PwaBadge />
+          <Routes>
+            <Route 
+              path="/login" 
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/transactions" 
+              element={
+                <ProtectedRoute>
+                  <TransactionsHistory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/budgets" 
+              element={
+                <ProtectedRoute>
+                  <Budgets />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/savings" 
+              element={
+                <ProtectedRoute>
+                  <Savings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/categories" 
+              element={
+                <ProtectedRoute>
+                  <Categories />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/subscriptions" 
+              element={
+                <ProtectedRoute>
+                  <Subscriptions />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </BrowserRouter>
+      </PrivacyProvider>
     </AuthProvider>
   );
 }

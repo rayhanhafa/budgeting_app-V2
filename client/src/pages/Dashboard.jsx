@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { PrivacyContext } from '../context/PrivacyContext';
+import { Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import TransactionModal from '../components/TransactionModal';
@@ -9,6 +11,7 @@ import DailyLineChart from '../components/DailyLineChart';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
+  const { isBalanceHidden, togglePrivacy, formatCurrency } = useContext(PrivacyContext);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,10 +106,15 @@ const Dashboard = () => {
         </section>
 
         {/* Total Balance */}
-        <section className="text-center py-2">
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Balance</p>
+        <section className="text-center py-2 relative">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-center gap-2">
+            Total Balance
+            <button onClick={togglePrivacy} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+              {isBalanceHidden ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </p>
           <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white">
-            Rp {totalBalance.toLocaleString('id-ID')}
+            {formatCurrency(totalBalance)}
           </h2>
         </section>
 
@@ -115,13 +123,13 @@ const Dashboard = () => {
           <div className="card p-4 bg-green-50/50 dark:bg-green-900/10 border-green-100 dark:border-green-900/50">
             <p className="text-sm text-green-600 dark:text-green-500 font-medium">Income</p>
             <p className="text-xl font-bold text-green-700 dark:text-green-400">
-              Rp {monthlyIncome.toLocaleString('id-ID')}
+              {formatCurrency(monthlyIncome)}
             </p>
           </div>
           <div className="card p-4 bg-red-50/50 dark:bg-red-900/10 border-red-100 dark:border-red-900/50">
             <p className="text-sm text-red-600 dark:text-red-500 font-medium">Expense</p>
             <p className="text-xl font-bold text-red-700 dark:text-red-400">
-              Rp {monthlyExpense.toLocaleString('id-ID')}
+              {formatCurrency(monthlyExpense)}
             </p>
           </div>
         </section>
@@ -154,7 +162,7 @@ const Dashboard = () => {
                     <p className="text-xs text-slate-500">{acc.type}</p>
                   </div>
                   <p className="font-bold text-slate-700 dark:text-slate-300">
-                    Rp {Number(acc.balance).toLocaleString('id-ID')}
+                    {formatCurrency(acc.balance)}
                   </p>
                 </div>
               ))
