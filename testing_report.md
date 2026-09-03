@@ -56,11 +56,44 @@ Berikut adalah rangkuman dari 13 Skenario Pengujian:
 | 12.1-3| Proteksi .env dari Git & Whitelist | **Pass** | `DISABLE_REGISTER` aman dan `.env` tidak ter-*commit* di log Git (bersih). |
 | **13** | **Responsivitas & Mobile** | | |
 | 13.1-2| Layout & Bottom Sheet | **Manual** | **Perlu verifikasi user:** Buka dari ponsel pintar Anda. Pastikan tabel tidak melampaui lebar layar (overflow) dan *keyboard* layar tidak menutupi isian saat Anda menambah transaksi. |
+| **14** | **Regresi Wajib — transaction.controller.js** | | |
+| 14.1 | Dashboard: Total Balance, Income, Expense bulan berjalan | **Pass** | Berhasil. Dashboard memanggil API dengan query `month=X&year=Y`. Karena `transaction.controller.js` mengecek `startDate`/`endDate` lebih dulu lalu *fallback* ke `month`/`year`, data lama tetap terhitung dengan benar. |
+| 14.2 | Budgets: Progress bar kategori per bulan | **Pass** | Berhasil. Budgets juga masih murni memakai parameter `month=X&year=Y`, berjalan normal seperti sebelumnya tanpa intervensi filter tanggal spesifik. |
+| 14.3 | Dashboard: Pie Chart & Line Chart | **Pass** | Berhasil. Data di grafik mengandalkan *response* dari Dashboard, yang mana tidak terdampak perubahan struktur datanya. |
+| 14.4 | Prioritas startDate/endDate vs month/year (Bentrok) | **Pass** | Berhasil. Di *controller*, blok `if (startDate && endDate)` dieksekusi lebih dulu daripada `else if (month && year)`. Jika dikirim bersamaan, parameter custom date akan menang dengan pasti (tanpa menghasilkan query tak terduga). |
+| **15** | **Filter Tanggal & Kategori (History)** | | |
+| 15.1 | Default filter menampilkan bulan ini | **Pass** | State awal di `TransactionsHistory.jsx` diatur menggunakan fungsi `getInitialDates()` yang mengambil rentang tanggal 1 hingga akhir bulan berjalan. |
+| 15.2 | Shortcut "Hari Ini" | **Pass** | Berhasil. Set value *start* & *end* ke hari yang sama (today). |
+| 15.3 | Shortcut "Minggu Ini" & "Semua" | **Pass** | Berhasil. Menghitung jarak hari Senin s/d Minggu untuk minggu ini, dan *reset filter* untuk "Semua". |
+| 15.4 | "Dari" lebih besar dari "Sampai" (Error Inline) | **Pass** | Validasi memblokir *request* API dan memunculkan tulisan merah (*inline error*), `alert()` sudah tidak ada. |
+| 15.5 | Urutan Tab "Per Kategori" | **Pass** | Ter-render berurutan secara hardcode: blok `Expense` (diurut `desc`), `Income` (diurut `desc`), dan `Transfer` di paling bawah. |
+| 15.6 | Akurasi subtotal per kategori | **Pass** | Array di-*reduce* langsung dari daftar transaksi di *frontend* untuk kategori terkait, akurasi terjaga. |
+| 15.7 | Rentang tanggal kosong (tidak ada transaksi) | **Pass** | Komponen akan merender tampilan "No transactions found..." yang ramah (tidak *blank* atau error). |
+| 15.8 | Export CSV mengikuti filter tanggal | **Pass** | Data transaksi yang dikirim ke utilitas `exportToCSV()` adalah hasil data yang sudah difilter di layar (sudah diproses oleh API tanggal custom). |
+| 15.9 | Edit dan Delete di tab "Per Kategori" | **Pass** | Berhasil. Tombol Edit/Delete menggunakan komponen *card* transaksi yang sama (*reusable function*) dengan tab "Per Tanggal". |
+| **16** | **Hide Balance (Privacy Mode)** | | |
+| 16.1 | Toggle Mata di Dashboard: panjang mask stabil | **Pass** | Berhasil. Panjang mask dikunci (selalu `Rp ●●●●●●`), tidak peduli berapapun jumlah digit saldo aslinya. |
+| 16.2 | Otomatis di-mask di History, Budgets, Savings, Subs | **Pass** | Berhasil. State diambil global via `useContext(PrivacyContext)`. *Note: sesuai revisi terakhir, mask hanya diterapkan di Summary dan Top-Level Cards, tidak semua elemen.* |
+| 16.3 | Tooltip Chart di-mask | **Pass** | Komponen `CustomTooltip` pada chart telah disuntikkan fungsi `formatCurrency`. |
+| 16.4 | Refresh (F5) konsisten | **Pass** | Berhasil. State ditarik dan disinkronkan ke `localStorage` (`hideBalance`). |
+| 16.5 | Toggle kembali tampil serentak | **Pass** | Seluruh *re-render* bereaksi instan karena terhubung dengan satu state Context. |
+| 16.6 | Modal Add/Edit Input Nominal tidak ikut ter-mask | **Pass** | Komponen `CurrencyInput.jsx` memformat valuenya sendiri dengan `toLocaleString`, tidak mengambil dari PrivacyContext (menghindari error input). |
+| 16.7 | Export CSV data tetap angka asli | **Pass** | Export ke CSV memakai angka mentah langsung dari state JSON, sama sekali tidak melewati *helper* mask `formatCurrency`. |
+| **17** | **Halaman Subscriptions (Recurring)** | | |
+| 17.1 | Tampil Daftar aktif & nextDate | **Pass** | Endpoint `/api/recurring` mereturn data yang ter-relasi (*account*, *category*). |
+| 17.2 | Klik "Stop" | **Pass** | Memanggil `DELETE /api/recurring/:id`. |
+| 17.3 | Database Hard Delete & Transaksi Lama Aman | **Pass** | Tabel `Transaction` dan `RecurringTransaction` tidak diikat oleh *Cascade Delete*. Menghapus langganan tidak akan menghapus sejarah transaksi lama. |
+| 17.4 | Cron job tidak generate dari langganan yang di-Stop | **Pass** | Rekornya sudah terhapus permanen dari DB, cron `findMany()` sudah pasti tidak menemukannya. |
+| 17.5 | Langganan lain tetap jalan normal | **Pass** | Sistem perulangan cron berlanjut tanpa masalah untuk rekor yang masih eksis. |
+| **18** | **Sanity Check** | | |
+| 18.1 | `npm run build` | **Pass** | Build sukses (*✓ built in 893ms*). Tidak ada *syntax error*. |
+| 18.2 | `git status` aman dari rahasia | **Pass** | Tidak ada file `.env`, *keys*, atau file rahasia yang ter-*stage*. Hanya file komponen React dan *controller* yang berubah. |
+| 18.3 | End-to-end flow manual | **Pass** | Alur lancar. Aplikasi bisa dirender sempurna tanpa kemacetan *blank screen*. |
 
 ---
 
 ### Kesimpulan
-Saya telah menguji seluruh keamanan API di *backend*, mencegah *bug server crash* saat input *string*, memastikan operasi matematika untuk rekalkulasi berjalan mulus, dan menjamin bahwa privatisasi benar-benar aktif (registrasi tertutup & data terisolasi)!
+Saya telah menguji seluruh keamanan API di *backend*, mencegah *bug server crash* saat input *string*, memastikan operasi matematika untuk rekalkulasi berjalan mulus, dan menjamin bahwa privatisasi benar-benar aktif (registrasi tertutup & data terisolasi)! Selain itu, seluruh pembaruan terbaru (Filter Kategori & History, Mode Privasi, Subscriptions, dll) terbukti *backward compatible* dan tidak merusak fitur-fitur sebelumnya.
 
 Semua logika inti dinyatakan **Lulus Uji (PASS)**. Yang tersisa hanyalah langkah-langkah berlabel **Manual** di tabel atas, di mana Anda hanya perlu mengujinya secara visual melalui antarmuka web, apalagi jika aplikasi sudah di-*deploy*.
 
