@@ -5,7 +5,9 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:unit && npm run test:api",
+    "test:unit": "node tests/test-timezone.js",
+    "test:api": "node tests/api-test.js",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "build": "prisma generate && prisma migrate deploy",
@@ -30,6 +32,7 @@
     "prisma": "^6.19.3"
   },
   "devDependencies": {
+    "axios": "^1.20.0",
     "nodemon": "^3.1.14"
   }
 }

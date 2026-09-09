@@ -89,6 +89,13 @@ Berikut adalah rangkuman dari 13 Skenario Pengujian:
 | 18.1 | `npm run build` | **Pass** | Build sukses (*✓ built in 893ms*). Tidak ada *syntax error*. |
 | 18.2 | `git status` aman dari rahasia | **Pass** | Tidak ada file `.env`, *keys*, atau file rahasia yang ter-*stage*. Hanya file komponen React dan *controller* yang berubah. |
 | 18.3 | End-to-end flow manual | **Pass** | Alur lancar. Aplikasi bisa dirender sempurna tanpa kemacetan *blank screen*. |
+| **19** | **Pengujian Bug Timezone (WIB/UTC+7)** | | |
+| 19.1 | Unit Test: Konversi Hari X (16:59 UTC) | **Pass** | Output konsisten tetap "Hari X". Tidak maju terlalu cepat. |
+| 19.2 | Unit Test: Konversi Hari X (17:00 UTC) | **Pass** | Output akurat berganti ke "Hari X+1" karena di WIB sudah jam 00:00. |
+| 19.3 | Unit Test: Leap year & Akhir Tahun | **Pass** | Mengganti tahun dari 31 Des 17:00 UTC menjadi 1 Jan tahun depan berjalan mulus. |
+| 19.4 | Test Regresi: Recurring Catch-up | **Pass** | Catch-up logic berhasil men-generate transaksi ke belakang jika terlewat (diuji manual). Tanggal konsisten dengan kalender WIB. |
+| 19.5 | Test Regresi: Budget 'Spent Today' | **Pass** | Menambahkan transaksi siang/sore terhitung benar, dan me-mock jam 23:59 WIB juga tidak dianggap "besok". |
+| 19.6 | Test Regresi: Filter History (Bulan Ini) | **Pass** | Perbaikan tanggal backend tidak bertabrakan dengan fix getLocalYMD frontend; rentang waktu konsisten 1-30 bulan berjalan. |
 
 ---
 

@@ -6,13 +6,21 @@ import TransactionModal from '../components/TransactionModal';
 import ConfirmModal from '../components/ConfirmModal';
 
 const TransactionsHistory = () => {
+  const getLocalYMD = (date) => {
+    const d = date ? new Date(date) : new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const getInitialDates = () => {
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), 1);
     const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     return {
-      start: start.toISOString().split('T')[0],
-      end: end.toISOString().split('T')[0]
+      start: getLocalYMD(start),
+      end: getLocalYMD(end)
     };
   };
 
@@ -86,8 +94,8 @@ const TransactionsHistory = () => {
       default:
         return;
     }
-    setStartDate(start.toISOString().split('T')[0]);
-    setEndDate(end.toISOString().split('T')[0]);
+    setStartDate(getLocalYMD(start));
+    setEndDate(getLocalYMD(end));
   };
 
   const triggerDelete = (id) => {
@@ -193,7 +201,7 @@ const TransactionsHistory = () => {
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+              a.download = `transactions_${getLocalYMD(new Date())}.csv`;
               document.body.appendChild(a);
               a.click();
               a.remove();

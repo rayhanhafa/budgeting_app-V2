@@ -112,9 +112,9 @@ export const createTransaction = async (req, res) => {
       if (frequency && ['DAILY', 'WEEKLY', 'MONTHLY'].includes(frequency)) {
         // Calculate next date natively to avoid date-fns import overhead here
         const nextDate = new Date(date);
-        if (frequency === 'DAILY') nextDate.setDate(nextDate.getDate() + 1);
-        if (frequency === 'WEEKLY') nextDate.setDate(nextDate.getDate() + 7);
-        if (frequency === 'MONTHLY') nextDate.setMonth(nextDate.getMonth() + 1);
+        if (frequency === 'DAILY') nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+        if (frequency === 'WEEKLY') nextDate.setUTCDate(nextDate.getUTCDate() + 7);
+        if (frequency === 'MONTHLY') nextDate.setUTCMonth(nextDate.getUTCMonth() + 1);
 
         await prismaTx.recurringTransaction.create({
           data: {

@@ -115,7 +115,7 @@ const Budgets = () => {
         <div className="card p-4 bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/50">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Total Budget Summary</h2>
           {(() => {
-            const totalBudget = progressData.reduce((acc, curr) => acc + curr.budgetAmount, 0);
+            const totalBudget = progressData.reduce((acc, curr) => acc + (curr.budgetAmount || 0), 0);
             const totalSpent = progressData.reduce((acc, curr) => acc + curr.spentAmount, 0);
             const totalPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
             
@@ -126,18 +126,26 @@ const Budgets = () => {
             return (
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-end">
-                  <div className="flex justify-between items-end mt-4">
+                  <div className="flex gap-2 items-baseline mt-4">
                     <p className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(totalSpent)}</p>
-                    <p className="text-sm font-medium text-slate-500">of</p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(totalBudget)}</p>
+                    {totalBudget > 0 && <p className="text-sm font-medium text-slate-500">of {formatCurrency(totalBudget)}</p>}
                   </div>
+                  {totalBudget > 0 ? (
+                    <p className={`text-sm font-bold ${barColor.replace('bg-', 'text-')}`}>
+                      {Math.round(totalPercentage)}%
+                    </p>
+                  ) : (
+                    <p className="text-sm font-medium text-slate-500 italic">No limit set</p>
+                  )}
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-1 overflow-hidden">
-                  <div 
-                    className={`h-3 rounded-full ${barColor} transition-all duration-500`} 
-                    style={{ width: `${Math.min(totalPercentage, 100)}%` }}
-                  ></div>
-                </div>
+                {totalBudget > 0 && (
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-1 overflow-hidden">
+                    <div 
+                      className={`h-3 rounded-full ${barColor} transition-all duration-500`} 
+                      style={{ width: `${totalPercentage}%` }}
+                    ></div>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -147,9 +155,9 @@ const Budgets = () => {
         <div className="flex flex-col gap-4">
           {categories.map(cat => {
             const budget = progressData.find(p => p.category.id === cat.id);
-            const isSet = !!budget;
+            const isSet = budget && budget.budgetAmount !== null;
             const spent = budget ? budget.spentAmount : 0;
-            const limit = budget ? budget.budgetAmount : 0;
+            const limit = budget ? (budget.budgetAmount || 0) : 0;
             const percentage = limit > 0 ? (spent / limit) * 100 : 0;
             
             const dailyLimit = limit > 0 ? Math.round(limit / daysInMonth) : 0;
@@ -206,7 +214,9 @@ const Budgets = () => {
                     )}
                   </>
                 ) : (
-                  <p className="text-sm text-slate-400 italic">No budget set for this month.</p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Spent: {formatCurrency(spent)}</span>
+                  </div>
                 )}
               </div>
             );

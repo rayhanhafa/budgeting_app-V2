@@ -1,6 +1,7 @@
 import cron from 'node-cron';
-import { addDays, addWeeks, addMonths, isBefore, isEqual, startOfDay } from 'date-fns';
+import { isBefore, isEqual } from 'date-fns';
 import prisma from '../prisma/client.js';
+import { getWibMidnight } from '../utils/timezone.js';
 
 // We need to duplicate the applyTransactionToBalance logic here or extract it
 const applyTransactionToBalance = async (prismaTx, transaction) => {
@@ -29,10 +30,11 @@ const applyTransactionToBalance = async (prismaTx, transaction) => {
 };
 
 const getNextDate = (currentDate, frequency) => {
-  if (frequency === 'DAILY') return addDays(currentDate, 1);
-  if (frequency === 'WEEKLY') return addWeeks(currentDate, 1);
-  if (frequency === 'MONTHLY') return addMonths(currentDate, 1);
-  return currentDate;
+  const d = new Date(currentDate);
+  if (frequency === 'DAILY') d.setUTCDate(d.getUTCDate() + 1);
+  if (frequency === 'WEEKLY') d.setUTCDate(d.getUTCDate() + 7);
+  if (frequency === 'MONTHLY') d.setUTCMonth(d.getUTCMonth() + 1);
+  return d;
 };
 
 // Run every hour at minute 0 (or once a day at midnight '0 0 * * *')
@@ -48,7 +50,7 @@ export const startRecurringTransactionsCron = () => {
 
 export const processRecurringTransactions = async () => {
   try {
-    const today = startOfDay(new Date());
+    const today = getWibMidnight();
 
     // Find all active recurring transactions that are due today or in the past
     const dueRecurringTxs = await prisma.recurringTransaction.findMany({
@@ -64,7 +66,7 @@ export const processRecurringTransactions = async () => {
 
     for (const recurring of dueRecurringTxs) {
       await prisma.$transaction(async (prismaTx) => {
-        let currentDate = startOfDay(new Date(recurring.nextDate));
+        let currentDate = new Date(recurring.nextDate);
         let txsCreated = 0;
 
         // Loop to catch up if missed multiple periods (e.g. server down for a week on DAILY)

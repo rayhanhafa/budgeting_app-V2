@@ -10,7 +10,15 @@ const TransactionModal = ({ isOpen, onClose, onSuccess, initialData = null }) =>
   const [accountId, setAccountId] = useState('');
   const [toAccountId, setToAccountId] = useState('');
   const [note, setNote] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const getLocalYMD = (date) => {
+    const d = date ? new Date(date) : new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [date, setDate] = useState(getLocalYMD());
   
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState('MONTHLY');
@@ -52,7 +60,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess, initialData = null }) =>
       setAccountId(initialData.accountId || '');
       setToAccountId(initialData.toAccountId || '');
       setNote(initialData.note || '');
-      setDate(new Date(initialData.date).toISOString().split('T')[0]);
+      setDate(getLocalYMD(initialData.date));
       setIsRecurring(false);
     } else if (isOpen) {
       // Reset form if creating new
@@ -61,7 +69,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess, initialData = null }) =>
       setCategoryId('');
       setToAccountId('');
       setNote('');
-      setDate(new Date().toISOString().split('T')[0]);
+      setDate(getLocalYMD());
       setIsRecurring(false);
       setFrequency('MONTHLY');
       setError('');
