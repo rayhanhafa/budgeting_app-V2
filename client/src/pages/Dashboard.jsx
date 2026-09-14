@@ -7,13 +7,14 @@ import { Link } from 'react-router-dom';
 import TransactionModal from '../components/TransactionModal';
 import AccountModal from '../components/AccountModal';
 import ExpensePieChart from '../components/ExpensePieChart';
-import DailyLineChart from '../components/DailyLineChart';
+import CumulativeSpendingChart from '../components/CumulativeSpendingChart';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const { isBalanceHidden, togglePrivacy, formatCurrency } = useContext(PrivacyContext);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [budgetProgress, setBudgetProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
@@ -24,13 +25,15 @@ const Dashboard = () => {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
 
-      const [accRes, txRes] = await Promise.all([
+      const [accRes, txRes, progRes] = await Promise.all([
         api.get('/accounts'),
-        api.get(`/transactions?month=${month}&year=${year}`)
+        api.get(`/transactions?month=${month}&year=${year}`),
+        api.get(`/budgets/progress?month=${month}&year=${year}`)
       ]);
       
       setAccounts(accRes.data);
       setTransactions(txRes.data);
+      setBudgetProgress(progRes.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
     } finally {
@@ -43,6 +46,7 @@ const Dashboard = () => {
   }, [fetchDashboardData]);
 
   const totalBalance = accounts.reduce((acc, account) => acc + Number(account.balance), 0);
+  const totalLimitBudget = budgetProgress.reduce((acc, curr) => acc + (curr.budgetAmount || 0), 0);
   
   // Calculate this month's income and expense
   const monthlyIncome = transactions
@@ -137,7 +141,12 @@ const Dashboard = () => {
         {/* Charts Section */}
         <section className="flex flex-col gap-4">
           <ExpensePieChart transactions={transactions} />
-          <DailyLineChart transactions={transactions} />
+          <CumulativeSpendingChart 
+            transactions={transactions} 
+            totalLimitBudget={totalLimitBudget}
+            month={new Date().getMonth() + 1}
+            year={new Date().getFullYear()}
+          />
         </section>
 
         {/* Accounts List (MVP) */}

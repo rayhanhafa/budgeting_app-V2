@@ -26,7 +26,7 @@ async function runTests() {
     // 1.3 Login User 1
     let token1, token2;
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, { email: 'rayhanhafa@gmail.com', password: 'm34t0g9I+oQO' });
+      const res = await axios.post(`${API_URL}/auth/login`, { email: 'rayhanhafa@gmail.com', password: 'hafa2002' });
       token1 = res.data.token;
       log('1.3 Login User 1', true);
     } catch (e) {
@@ -34,7 +34,7 @@ async function runTests() {
     }
     
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, { email: 'kkucingtidurr00@gmail.com', password: 'j98Y1jfRnOaw' });
+      const res = await axios.post(`${API_URL}/auth/login`, { email: 'kkucingtidurr00@gmail.com', password: 'hafa2002' });
       token2 = res.data.token;
       log('1.3 Login User 2', true);
     } catch (e) {

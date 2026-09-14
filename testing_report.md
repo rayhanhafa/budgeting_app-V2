@@ -96,6 +96,11 @@ Berikut adalah rangkuman dari 13 Skenario Pengujian:
 | 19.4 | Test Regresi: Recurring Catch-up | **Pass** | Catch-up logic berhasil men-generate transaksi ke belakang jika terlewat (diuji manual). Tanggal konsisten dengan kalender WIB. |
 | 19.5 | Test Regresi: Budget 'Spent Today' | **Pass** | Menambahkan transaksi siang/sore terhitung benar, dan me-mock jam 23:59 WIB juga tidak dianggap "besok". |
 | 19.6 | Test Regresi: Filter History (Bulan Ini) | **Pass** | Perbaikan tanggal backend tidak bertabrakan dengan fix getLocalYMD frontend; rentang waktu konsisten 1-30 bulan berjalan. |
+| **20** | **Frontend Components — CumulativeSpendingChart** | | |
+| 20.1 | Render *Empty State* tanpa transaksi/budget | **Pass** | Teks "No expense transactions this month" dan insight "Set budget kategori..." muncul dengan benar. |
+| 20.2 | Insight: Pengeluaran di bawah Pace Ideal | **Pass** | Teks menandakan "Kamu masih di jalur aman" muncul dengan benar berdasarkan kalkulasi hari ini. |
+| 20.3 | Insight: Pengeluaran melebihi Pace Ideal | **Pass** | Teks peringatan muncul jika kumulatif melebihi *expected pace* harian. |
+| 20.4 | Privacy Mode Terapan di Teks Insight | **Pass** | Memastikan komponen memanggil fungsi `formatCurrency` dari `PrivacyContext` sehingga nominal ter-mask (`Rp ●●●●●●`) saat aktif. |
 
 ---
 
