@@ -143,7 +143,7 @@ const Dashboard = () => {
           <ExpensePieChart transactions={transactions} />
           <CumulativeSpendingChart 
             transactions={transactions} 
-            totalLimitBudget={totalLimitBudget}
+            budgetProgress={budgetProgress}
             month={new Date().getMonth() + 1}
             year={new Date().getFullYear()}
           />
